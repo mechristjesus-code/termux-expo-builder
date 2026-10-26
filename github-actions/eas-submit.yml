@@ -1,0 +1,31 @@
+name: Submit latest EAS build
+
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: Store platform
+        required: true
+        default: android
+        type: choice
+        options: [android, ios]
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+          packager: npm
+      - name: Submit latest build
+        run: eas submit --platform "${{ github.event.inputs.platform || 'android' }}" --profile production --latest --non-interactive

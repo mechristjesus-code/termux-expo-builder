@@ -5,6 +5,7 @@
   "dependencies": {
     "expo": "~58.0.19",
     "expo-status-bar": "~58.0.4",
+    "expo-updates": "~58.0.18",
     "react": "19.3.0",
     "react-native": "0.88.0"
   },
@@ -25,6 +26,12 @@
     "build:android:production": "eas build --platform android --profile production",
     "build:ios": "eas build --platform ios --profile production",
     "build:all": "eas build --platform all --profile production",
+    "eas:init": "eas init",
+    "update:configure": "eas update:configure",
+    "update:preview": "eas update --channel preview --message",
+    "update:production": "eas update --channel production --message",
+    "submit:android": "eas submit --platform android --profile production --latest",
+    "submit:ios": "eas submit --platform ios --profile production --latest",
     "lint": "expo lint"
   },
   "private": true

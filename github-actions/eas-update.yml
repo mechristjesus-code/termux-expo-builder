@@ -1,0 +1,39 @@
+name: EAS OTA Update
+
+on:
+  workflow_dispatch:
+    inputs:
+      channel:
+        description: Update channel
+        required: true
+        default: preview
+        type: choice
+        options: [preview, production]
+      message:
+        description: Update message
+        required: true
+        default: Update from GitHub Actions
+        type: string
+  push:
+    branches: [main]
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+          packager: npm
+      - name: Publish OTA update
+        run: eas update --channel "${{ github.event.inputs.channel || 'preview' }}" --message "${{ github.event.inputs.message || 'Update from GitHub Actions' }}" --non-interactive

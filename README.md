@@ -108,6 +108,12 @@ Telegram uses the same command format: `/build android preview`, `/build android
 
 Replace the starter screen in `App.tsx`. Put non-secret runtime configuration in `.env` using `EXPO_PUBLIC_` variables and keep secrets in EAS/GitHub secret storage. Replace the files in `assets/` with your own square icon and splash artwork before distributing the app.
 
+## APK, web, and continuous upgrades
+
+This same project supports an installable Android APK, iOS builds, and a web target. It also includes `expo-updates` with separate `preview` and `production` channels. JavaScript, styling, copy, and compatible assets can be published over the air after the first binary is installed. Native dependencies, permissions, Expo SDK changes, and native configuration still require a new APK or iOS build. See [`docs/updates-and-platforms.md`](./docs/updates-and-platforms.md) for the complete setup.
+
+For Google Play internal testing, TestFlight, and eventual store release, see [`docs/store-release.md`](./docs/store-release.md). The repository includes a manual GitHub Actions submission template in `github-actions/eas-submit.yml`.
+
 ## License
 
 MIT. See [LICENSE](./LICENSE).
