@@ -3,13 +3,16 @@
     "name": "termux-expo-builder",
     "slug": "termux-expo-builder",
     "version": "1.0.0",
+    "scheme": "termuxexpobuilder",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.example.termuxexpobuilder"
     },
     "android": {
+      "package": "com.example.termuxexpobuilder",
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
         "foregroundImage": "./assets/android-icon-foreground.png",
