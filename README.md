@@ -92,6 +92,18 @@ npm run web              # Run the web target locally
 npm run build:all        # Production Android + iOS EAS build
 ```
 
+## Telegram and n8n build control
+
+The repository includes a Termux client and an importable n8n workflow. See [`n8n/README.md`](./n8n/README.md) to connect Telegram to GitHub Actions, then configure the webhook URL in Termux. Once configured, you can request a build without opening a browser:
+
+```bash
+bash scripts/termux-setup.sh
+source ~/.config/termux-expo-builder/env
+bash scripts/build-request.sh android preview
+```
+
+Telegram uses the same command format: `/build android preview`, `/build android production`, `/build ios production`, or `/build all production`.
+
 ## Customization
 
 Replace the starter screen in `App.tsx`. Put non-secret runtime configuration in `.env` using `EXPO_PUBLIC_` variables and keep secrets in EAS/GitHub secret storage. Replace the files in `assets/` with your own square icon and splash artwork before distributing the app.

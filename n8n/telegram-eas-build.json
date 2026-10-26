@@ -1,0 +1,78 @@
+{
+  "name": "Telegram + Termux → Expo EAS Build",
+  "nodes": [
+    {
+      "parameters": {"updates": ["message"]},
+      "id": "telegram-trigger",
+      "name": "Telegram Trigger",
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [-760, -180],
+      "credentials": {"telegramApi": {"id": "", "name": "Telegram build bot"}}
+    },
+    {
+      "parameters": {"httpMethod": "POST", "path": "termux-expo-build", "responseMode": "onReceived", "options": {}},
+      "id": "termux-webhook",
+      "name": "Termux Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [-760, 120],
+      "webhookId": "termux-expo-build"
+    },
+    {
+      "parameters": {"jsCode": "const input = $json.message?.text ?? $json.body?.text ?? '';\nconst match = input.trim().match(/^\\/build\\s+(android|ios|all)(?:\\s+(preview|production))?$/i);\nif (!match) {\n  return [{ json: { valid: false, reply: 'Use /build android preview, /build android production, /build ios production, or /build all production.' } }];\n}\nconst platform = match[1].toLowerCase();\nconst profile = (match[2] ?? 'preview').toLowerCase();\nreturn [{ json: { valid: true, platform, profile, repository: 'mechristjesus-code/termux-expo-builder', ref: 'main', telegramChatId: $json.message?.chat?.id ?? null } }];"},
+      "id": "parse-request",
+      "name": "Parse Build Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [-420, -40]
+    },
+    {
+      "parameters": {"conditions": {"boolean": [{"value1": "={{$json.valid}}", "operation": "isTrue"}]}},
+      "id": "valid-request",
+      "name": "Valid Request?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [-160, -40]
+    },
+    {
+      "parameters": {"method": "POST", "url": "https://api.github.com/repos/mechristjesus-code/termux-expo-builder/actions/workflows/eas-build.yml/dispatches", "authentication": "predefinedCredentialType", "nodeCredentialType": "githubApi", "sendHeaders": true, "headerParameters": {"parameters": [{"name": "Accept", "value": "application/vnd.github+json"}, {"name": "X-GitHub-Api-Version", "value": "2022-11-28"}]}, "sendBody": true, "specifyBody": "json", "jsonBody": "={{ { ref: $json.ref, inputs: { platform: $json.platform, profile: $json.profile } } }}", "options": {}},
+      "id": "dispatch-github",
+      "name": "Dispatch GitHub Actions",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [100, -160],
+      "credentials": {"githubApi": {"id": "", "name": "GitHub Actions"}}
+    },
+    {
+      "parameters": {"jsCode": "return [{ json: { ...$json, reply: `Build queued: ${$json.platform}/${$json.profile}. Watch GitHub Actions at https://github.com/mechristjesus-code/termux-expo-builder/actions` } }];"},
+      "id": "success-reply",
+      "name": "Build Queued Reply",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [360, -160]
+    },
+    {
+      "parameters": {"chatId": "={{$json.telegramChatId}}", "text": "={{$json.reply}}", "additionalFields": {}},
+      "id": "telegram-reply",
+      "name": "Telegram Reply",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [620, -160],
+      "credentials": {"telegramApi": {"id": "", "name": "Telegram build bot"}}
+    }
+  ],
+  "connections": {
+    "Telegram Trigger": {"main": [[{"node": "Parse Build Request", "type": "main", "index": 0}]]},
+    "Termux Webhook": {"main": [[{"node": "Parse Build Request", "type": "main", "index": 0}]]},
+    "Parse Build Request": {"main": [[{"node": "Valid Request?", "type": "main", "index": 0}]]},
+    "Valid Request?": {"main": [[{"node": "Dispatch GitHub Actions", "type": "main", "index": 0}], [{"node": "Telegram Reply", "type": "main", "index": 0}]]},
+    "Dispatch GitHub Actions": {"main": [[{"node": "Build Queued Reply", "type": "main", "index": 0}]]},
+    "Build Queued Reply": {"main": [[{"node": "Telegram Reply", "type": "main", "index": 0}]]}
+  },
+  "active": false,
+  "settings": {"executionOrder": "v1"},
+  "versionId": "termux-expo-build-v1",
+  "meta": {"templateCredsSetupCompleted": false},
+  "tags": []
+}
