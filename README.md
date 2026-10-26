@@ -114,6 +114,8 @@ This same project supports an installable Android APK, iOS builds, and a web tar
 
 For Google Play internal testing, TestFlight, and eventual store release, see [`docs/store-release.md`](./docs/store-release.md). The repository includes a manual GitHub Actions submission template in `github-actions/eas-submit.yml`.
 
+For the local GGUF copilot, llama.cpp/Termux setup, and the shared AI endpoint used by the APK, web app, Termux, and n8n, see [`docs/ai-gguf.md`](./docs/ai-gguf.md). The app never bundles the large model file; it connects to the local model service.
+
 ## License
 
 MIT. See [LICENSE](./LICENSE).
